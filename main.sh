@@ -53,10 +53,12 @@ function interpret () {
       echo -n "The password is incorrect. Please enter your password: "
     fi
   done
+  echo -n " \$  "
   while read line;
   do
     echo $line > toto
     echo $line | bash
+    echo -n " \$  "
   done
 }
 

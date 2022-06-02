@@ -2,6 +2,7 @@
 
 rm -f ./fifo
 mkfifo ./fifo
+hname="$(hostname -s)"
 
 function hash_password () {
     local pwd_hash_full=$(echo $1 | sha256sum)
@@ -25,7 +26,7 @@ function interpret () {
   current_date=$(LANG=en_us_88591; date)
 
   echo $current_date
-  echo "Welcome to Quentin and Firmin’s server!"
+  echo "Welcome to $hname!"
   echo -n "Please enter your password: "
   pwd_file=$(cat password.conf)
 
@@ -53,12 +54,11 @@ function interpret () {
       echo -n "The password is incorrect. Please enter your password: "
     fi
   done
-  hname="$(hostname -s)"
-  echo -n "$USER@$hname $PWD \$  "
+  echo -n "$USER@$hname $PWD \$ "
   while read line;
   do
     $line
-    echo -n "$USER@$hname $PWD \$  "
+    echo -n "$USER@$hname $PWD \$ "
   done
 }
 

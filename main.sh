@@ -53,15 +53,18 @@ function interpret () {
       echo -n "The password is incorrect. Please enter your password: "
     fi
   done
-  echo -n " \$  "
+  hname="$(hostname -s)"
+  echo -n "$USER@$hname $PWD \$  "
   while read line;
   do
-    echo $line > toto
-    echo $line | bash
-    echo -n " \$  "
+    $line
+    echo -n "$USER@$hname $PWD \$  "
   done
 }
 
 echo "[LOG] Server starting..."
-nc -kl localhost 12345 < ./fifo | interpret &> ./fifo
+while true
+do
+  nc -l localhost 12345 < ./fifo | interpret &> ./fifo
+done
 echo "[LOG] Server ending..."

@@ -15,18 +15,6 @@ function hash_password () {
     echo "$pwd_hash"
 }
 
-function test_password() {
-    for line in $1
-    do
-    if [ "$line" == "$hash_password $2" ]
-        then
-        return 1
-        else
-        return 0
-        fi
-    done
-}
-
 function decrypt() {
   echo -n "$1" | tr "$code" "A-Za-z"
 }

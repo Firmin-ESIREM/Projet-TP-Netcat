@@ -1,6 +1,7 @@
 *.conf
 fifo
 *.py
+*.key
 
 # General
 .DS_Store

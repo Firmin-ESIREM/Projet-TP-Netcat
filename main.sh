@@ -10,18 +10,6 @@ function hash_password () {
     echo "$pwd_hash"
 }
 
-function test_password() {
-    for line in $1
-    do
-    if [ "$line" == "$hash_password $2" ]
-        then
-        return 1
-        else
-        return 0
-        fi
-    done
-}
-
 function interpret () {
   current_date=$(LANG=en_us_88591; date)
 

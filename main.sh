@@ -16,19 +16,24 @@ function hash_password () {
 }
 
 function decrypt() {
-  echo -n "$1" | tr "$code" "A-Za-z"
+    echo "$1" | tr "$code" "A-Za-z"
 }
 
 function crypt() {
-  echo -n "$1" | tr "A-Za-z" "$code"
+  if [ "$2" == "-n" ]
+  then
+    echo -n "$1" | tr "A-Za-z" "$code"
+  else
+    echo "$1" | tr "A-Za-z" "$code"
+  fi
 }
 
 function interpret () {
   current_date=$(LANG=en_us_88591; date)
 
-  crypt "$current_date\n"
-  crypt "Welcome to $hname!\n"
-  crypt "Please enter your password: "
+  crypt "$current_date"
+  crypt "Welcome to $hname!"
+  crypt "Please enter your password: " -n
   pwd_file=$(cat password.conf)
 
 
@@ -49,18 +54,18 @@ function interpret () {
     done
     if [ $success == "1" ]
     then
-      crypt "The password is correct. You are now logged in.\n"
+      crypt "The password is correct. You are now logged in."
       break
     else
-      crypt "The password is incorrect. Please enter your password: "
+      crypt "The password is incorrect. Please enter your password: " -n
     fi
   done
-  echo -n "$USER@$hname $PWD \$ "
+  echo -n "$USER@$hname $PWD \$ " -n
   while read line_enc;
   do
     line=$(decrypt line_enc)
     $line | xargs -I{} crypt {}
-    crypt "$USER@$hname $PWD \$ "
+    crypt "$USER@$hname $PWD \$ " -n
   done
 }
 

@@ -8,7 +8,7 @@ code="$code_upper$code_lower"
 
 function crypt(){
     exit=$(cat "$1" | tr "A-Za-z" "$code")
-    echo $exit 
+    echo $exit
 }
 
 function decrypt(){

@@ -38,15 +38,16 @@ while true
 do
   if read line < $output_fifo
   then
-    decrypt "$line"
-  else
-    if [[ i -eq 0 ]]
+    line_decrypt=$(decrypt "$line")
+    echo -n "$line_decrypt"
+    if [[ "$line_decrypt" == "Please enter your password: " ]]
     then
-      read -s -p line_in
-      i=1
-    else
-      read line_in
+      read -s line_in
+      crypt $line_in > $input_fifo
     fi
+
+  else
+    read line_in
     crypt $line_in > $input_fifo
   fi
 done

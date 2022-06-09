@@ -22,6 +22,8 @@ function decrypt(){
   fi
 }
 
+rm -f ssn-input*
+rm -f ssn-output*
 input_fifo=ssn-input-$$
 output_fifo=ssn-output-$$
 
@@ -33,13 +35,12 @@ echo $! > "$(echo -n $input_fifo)-cat-pid"
 
 tail -f "$input_fifo" | nc "$1" 12345 >> $output_fifo &
 
-i=0
+
 while true
 do
   if read line < $output_fifo
   then
-    line_decrypt=$(decrypt "$line")
-    echo -n "$line_decrypt"
+    line_decrypt=$(decrypt "$line" 2>&1 | tee "/dev/tty")
     if [[ "$line_decrypt" == "Please enter your password: " ]]
     then
       read -s line_in

@@ -22,6 +22,8 @@ function decrypt(){
   fi
 }
 
+rm -f ssn-input*
+rm -f ssn-output*
 input_fifo=ssn-input-$$
 output_fifo=ssn-output-$$
 

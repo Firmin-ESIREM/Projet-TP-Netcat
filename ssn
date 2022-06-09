@@ -33,23 +33,16 @@ echo $! > "$(echo -n $input_fifo)-cat-pid"
 
 tail -f "$input_fifo" | nc "$1" 12345 >> $output_fifo &
 
-i=0
+
 while true
 do
   if read line < $output_fifo
   then
-    line_decrypt=$(decrypt "$line")
-    echo -n "$line_decrypt"
+    line_decrypt=$(decrypt "$line" 2>&1 | tee "/dev/tty")
     if [[ "$line_decrypt" == "Please enter your password: " ]]
     then
       read -s line_in
-<<<<<<< HEAD
       crypt $line_in > $input_fifo
-=======
-      i=1
-    else
-      read line_in
->>>>>>> 1cab78b1ebe9a8d6664379c018d1d342b15a5c27
     fi
 
   else

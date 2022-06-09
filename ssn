@@ -7,18 +7,18 @@ code_lower=$(echo $code | tr "A-Z" "a-z")
 code="$code_upper$code_lower"
 
 function crypt(){
-    exit=$(cat "$1" | tr "A-Za-z" "$code")
+    exit=$(echo "$1" | tr "A-Za-z" "$code")
     echo $exit 
 }
 
 function decrypt(){
-    exit=$(cat $1 | tr $code "A-Za-z")
+    exit=$(echo $1 | tr $code "A-Za-z")
     echo $exit
 }
 
-
+a=$(nc $1 5859)
 while read line;
+do
     line_encrypted=$(crypt "$line")
-    echo line_encrypted | nc target $1 12345
-    encrypted_output=$(nc -l $1 12345)
-    echo "$(decrypt $encrypted_output)"
+
+done

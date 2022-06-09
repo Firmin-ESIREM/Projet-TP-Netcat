@@ -22,7 +22,8 @@ function decrypt() {
 function crypt() {
   if [ "$2" == "-n" ]
   then
-    echo -n "$1" | tr "A-Za-z" "$code"
+    encrypted=$(echo "$1" | tr "A-Za-z" "$code")
+    echo "$encrypted%\$%n"
   else
     echo "$1" | tr "A-Za-z" "$code"
   fi

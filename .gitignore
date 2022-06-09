@@ -1,5 +1,7 @@
 *.conf
 fifo
+ssn-input-*
+ssn-output-*
 *.py
 *.key
 

@@ -12,12 +12,42 @@ function crypt(){
 }
 
 function decrypt(){
+  if [[ "$1" == *"%\$%n"* ]]
+  then
+    exit=$(echo $1 | rev | cut -f3 -d "%" | rev | tr $code "A-Za-z")
+    echo -n "$exit"
+  else
     exit=$(echo $1 | tr $code "A-Za-z")
-    echo $exit
+    echo "$exit"
+  fi
 }
 
-a=$(nc $1 5859)
-while read line;
+input_fifo=ssn-input-$$
+output_fifo=ssn-output-$$
+
+mkfifo "$output_fifo"
+
+mkfifo "$input_fifo"
+cat > "$input_fifo" &
+echo $! > "$(echo -n $input_fifo)-cat-pid"
+
+tail -f "$input_fifo" | nc "$1" 12345 >> $output_fifo &
+
+
+while true
 do
-    line_encrypted=$(crypt "$line")
+  if read line < $output_fifo
+  then
+    decrypt "$line"
+  else
+    read line_in
+    crypt $line_in > $input_fifo
+  fi
 done
+
+#while read line < $output_fifo
+#do
+#  decrypt "$line"
+#  read line_in
+#  echo "$(crypt "$line_in")" > $input_fifo
+#done

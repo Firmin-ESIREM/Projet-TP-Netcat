@@ -33,14 +33,20 @@ echo $! > "$(echo -n $input_fifo)-cat-pid"
 
 tail -f "$input_fifo" | nc "$1" 12345 >> $output_fifo &
 
-
+i=0
 while true
 do
   if read line < $output_fifo
   then
     decrypt "$line"
   else
-    read line_in
+    if [[ i -eq 0 ]]
+    then
+      read -s -p line_in
+      i=1
+    else
+      read line_in
+    fi
     crypt $line_in > $input_fifo
   fi
 done

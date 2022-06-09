@@ -42,7 +42,7 @@ do
   else
     if [[ i -eq 0 ]]
     then
-      read -s -p line_in
+      read -s line_in
       i=1
     else
       read line_in

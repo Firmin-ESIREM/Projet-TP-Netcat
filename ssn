@@ -2,7 +2,7 @@
 
 if [ $# -ne 2 ] && [ $# -ne 3 ]
 then
-  >&2 echo "Usage: ./find_best.sh [keyfile] [host_to_connect] [port_to_connect (defaults to 12345)]"
+  >&2 echo "Usage: ./ssn [keyfile] [host_to_connect] [port_to_connect (defaults to 12345)]"
   exit 1
 fi
 

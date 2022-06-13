@@ -1,7 +1,21 @@
 #!/bin/bash
 
-key_file=$2
-code=$(cat $key_file)
+if [ $# -ne 2 ] && [ $# -ne 3 ]
+then
+  >&2 echo "Usage: ./find_best.sh [keyfile] [host_to_connect] [port_to_connect (defaults to 12345)]"
+  exit 1
+fi
+
+port_to_connect=""
+
+if [ $# -eq 2 ]
+then
+  port_to_connect="12345"
+else
+  port_to_connect="$3"
+fi
+
+code=$(cat "$1")
 code_upper=$(echo $code | tr "a-z" "A-Z")
 code_lower=$(echo $code | tr "A-Z" "a-z")
 code="$code_upper$code_lower"
@@ -12,50 +26,41 @@ function crypt(){
 }
 
 function decrypt(){
-  if [[ "$1" == *"%\$%n"* ]]
-  then
-    exit=$(echo $1 | rev | cut -f3 -d "%" | rev | tr $code "A-Za-z")
-    echo -n "$exit"
-  else
-    exit=$(echo $1 | tr $code "A-Za-z")
-    echo "$exit"
-  fi
+  exit=$(echo "$1" | tr "¶" "\n" | tr "$code" "A-Za-z")
+  echo -n "$exit"
 }
 
-rm -f ssn-input*
-rm -f ssn-output*
-input_fifo=ssn-input-$$
-output_fifo=ssn-output-$$
+input_fifo="./ssn-input"
+output_fifo="./ssn-output"
+rm -f "$input_fifo"
+rm -f "$output_fifo"
+
 
 mkfifo "$output_fifo"
 
 mkfifo "$input_fifo"
 cat > "$input_fifo" &
-echo $! > "$(echo -n $input_fifo)-cat-pid"
+pid=$!
 
-tail -f "$input_fifo" | nc "$1" 12345 >> $output_fifo &
+tail -f "$input_fifo" | nc "$2" "$port_to_connect" > $output_fifo &
 
 
 while true
 do
-  if read line < $output_fifo
+  read -d "EOF" line < $output_fifo
+  line_decrypt=$(decrypt "$line" 2>&1 | tee "/dev/tty")
+  if [[ "$line_decrypt" == *"Please enter your password:"* ]] || [[ "$line_decrypt" == *"The password is incorrect. Please enter your password:"* ]]
   then
-    line_decrypt=$(decrypt "$line" 2>&1 | tee "/dev/tty")
-    if [[ "$line_decrypt" == "Please enter your password: " ]]
-    then
-      read -s line_in
-      crypt $line_in > $input_fifo
-    fi
-
-  else
+    read -s line_in
+    echo $line_in > $input_fifo
+  elif [[ "$line_decrypt" == *"The password is correct. Waiting for encryption key..."* ]]
+  then
+    echo "$code_upper" > $input_fifo
+  elif [[ "$line_decrypt" == *"\$" ]]
+  then
+    echo -n " "
     read line_in
-    crypt $line_in > $input_fifo
+    crypt "$line_in" > $input_fifo
+
   fi
 done
-
-#while read line < $output_fifo
-#do
-#  decrypt "$line"
-#  read line_in
-#  echo "$(crypt "$line_in")" > $input_fifo
-#done

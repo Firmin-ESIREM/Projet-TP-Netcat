@@ -1,10 +1,3 @@
-*.conf
-fifo
-ssn-input-*
-ssn-output-*
-*.py
-*.key
-
 # General
 .DS_Store
 .AppleDouble
@@ -31,3 +24,15 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+
+
+# Project files
+
+*.conf
+fifo
+ssn-input
+ssn-output
+cmd_output
+*.py
+*.key

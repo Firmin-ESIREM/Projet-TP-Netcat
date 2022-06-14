@@ -40,7 +40,6 @@ mkfifo "$output_fifo"
 
 mkfifo "$input_fifo"
 cat > "$input_fifo" &
-pid=$!
 
 tail -f "$input_fifo" | nc "$2" "$port_to_connect" > $output_fifo &
 
@@ -51,6 +50,7 @@ do
   line_decrypt=$(decrypt "$line" 2>&1 | tee "/dev/tty")
   if [[ "$line_decrypt" == *"Please enter your password:"* ]] || [[ "$line_decrypt" == *"The password is incorrect. Please enter your password:"* ]]
   then
+    echo -n " "
     read -s line_in
     echo $line_in > $input_fifo
   elif [[ "$line_decrypt" == *"The password is correct. Waiting for encryption key..."* ]]
@@ -61,6 +61,9 @@ do
     echo -n " "
     read line_in
     crypt "$line_in" > $input_fifo
-
+    if [[ "$line_in" == "exit" ]] || [[ "$line_in" == "logout" ]]
+    then
+      exit 0
+    fi
   fi
 done
